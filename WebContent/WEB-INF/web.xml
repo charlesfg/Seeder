@@ -16,12 +16,6 @@
   	<param-value>false</param-value>
   </context-param>
   <servlet>
-    <description>Sample Servlet</description>
-    <display-name>SeederServlet</display-name>
-    <servlet-name>SeederServlet</servlet-name>
-    <servlet-class>com.example.myproject.SeederServlet</servlet-class>
-  </servlet>
-  <servlet>
   	<servlet-name>Seeder Application</servlet-name>
   	<servlet-class>com.vaadin.server.GAEVaadinServlet</servlet-class>
   	<init-param>
