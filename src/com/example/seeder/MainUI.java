@@ -30,40 +30,22 @@ import com.vaadin.ui.VerticalLayout;
 @Theme("seeder")
 public class MainUI extends UI {
 
+	String bucketName     = "cassiovideo";
+	String accessKey      = "AKIAIOSVOU76NK76N3LQ";
+	String secretKeyName  = "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";
+	String uploadFileName = "C:\\Users\\Cassio\\Desktop\\ftio.wma";
+	
+	String policy = S3SignManager.StringToBase64String(makePolicy());
+	String signedPolicy = S3SignManager.sign(secretKeyName,policy); 
+	
+	Label restForm = new Label(buildHTMLForm(), ContentMode.HTML);
+	
 	@Override
 	protected void init(VaadinRequest request) {
 		final VerticalLayout layout = new VerticalLayout();
 		layout.setMargin(true);
 		setContent(layout);
-
-//		final Label label = new Label(
-//        		"<form action=\"" + uploadUrl + "\" method=\"post\" enctype=\"multipart/form-data\">" +
-//                "<input type=\"file\" name=\"myImage\" />" +
-//                "<input type=\"hidden\" name=\"uploadKey\" value=\"" + uploadKey +"\" />" +
-//                "<input type=\"submit\" value=\"Upload\" />" +
-//                "</form>", Label.CONTENT_XHTML);
-
-		String bucketName     = "cassiovideo";
-		String accessKey      = "AKIAIOSVOU76NK76N3LQ";
-		String secretKeyName  = "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";
-		String uploadFileName = "C:\\Users\\Cassio\\Desktop\\ftio.wma";
-		
-
-		String policy = S3SignManager.StringToBase64String(makePolicy());
-		String signedPolicy = S3SignManager.sign(secretKeyName,policy); 
-		
-		final Label label = new Label(
-				"<form action=\"http://" + bucketName + ".s3.amazonaws.com/\" method=\"post\" enctype=\"multipart/form-data\">"+
-				    "Key to upload: <input type=\"input\" name=\"key\" value=\"video.flv\" /><br />"+
-				    "<input type=\"hidden\" name=\"acl\" value=\"public-read\" />" +
-				    //"<input type=\"hidden\" name=\"success_action_redirect\" value=\"http://johnsmith.s3.amazonaws.com/successful_upload.html\" />" +
-				    "<input type=\"hidden\" name=\"AWSAccessKeyId\" value=\""+ accessKey +"\" />" +
-				    "<input type=\"hidden\" name=\"Policy\" value=\""+ policy +"\" />" +
-				    "<input type=\"hidden\" name=\"Signature\" value=\""+ signedPolicy +"\" />" +
-				    "File: <input type=\"file\" name=\"file\" /> <br />" +
-				    "<input type=\"submit\" name=\"submit\" value=\"Upload to Amazon S3\" />" +
-				"</form>", ContentMode.HTML);
-		
+				
 		Button buttonZen = new Button("Zencoder");
 		buttonZen.addClickListener(new Button.ClickListener() {
 			public void buttonClick(ClickEvent event) {
@@ -78,8 +60,21 @@ public class MainUI extends UI {
 			}
 		});
 		
-		layout.addComponent(label);
+		layout.addComponent(restForm);
 		layout.addComponent(buttonZen);
+	}
+	
+	public String buildHTMLForm() {
+		return "<form action=\"http://" + bucketName + ".s3.amazonaws.com/\" method=\"post\" enctype=\"multipart/form-data\">"+
+		    "<input type=\"hidden\" name=\"key\" value=\"video.sp\" /><br />"+
+		    "<input type=\"hidden\" name=\"acl\" value=\"public-read\" />" +
+		    //"<input type=\"hidden\" name=\"success_action_redirect\" value=\"http://johnsmith.s3.amazonaws.com/successful_upload.html\" />" +
+		    "<input type=\"hidden\" name=\"AWSAccessKeyId\" value=\""+ accessKey +"\" />" +
+		    "<input type=\"hidden\" name=\"Policy\" value=\""+ policy +"\" />" +
+		    "<input type=\"hidden\" name=\"Signature\" value=\""+ signedPolicy +"\" />" +
+		    "File: <input type=\"file\" name=\"file\" /> <br />" +
+		    "<input type=\"submit\" name=\"submit\" value=\"Upload to Amazon S3\" />" +
+		"</form>";
 	}
 	
 	public void sendRequest() throws ZencoderClientException{
