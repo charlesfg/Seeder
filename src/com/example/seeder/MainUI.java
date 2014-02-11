@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mortbay.util.ajax.JSON;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -53,19 +52,6 @@ public class MainUI extends UI {
 		String policy = S3SignManager.StringToBase64String(makePolicy());
 		String signedPolicy = S3SignManager.sign(secretKeyName,policy); 
 		
-		policy = S3SignManager.StringToBase64String(makePolicy());
-		String signedPolicy2 = S3SignManager.sign(policy); 
-		
-		policy = S3SignManager.StringToBase64String(makePolicy());
-		String signedPolicy3 = S3SignManager.sign2(makePolicy()); 
-		
-
-		System.out.println(policy);
-		
-		System.out.println(signedPolicy);
-		System.out.println(signedPolicy2);
-		System.out.println(signedPolicy3);
-		System.out.println(signedPolicy.equals(signedPolicy2) + " . " + signedPolicy3.equals(signedPolicy2) + " . " +signedPolicy.equals(signedPolicy3));
 		final Label label = new Label(
 				"<form action=\"http://" + bucketName + ".s3.amazonaws.com/\" method=\"post\" enctype=\"multipart/form-data\">"+
 				    "Key to upload: <input type=\"input\" name=\"key\" value=\"video.flv\" /><br />"+
@@ -78,14 +64,6 @@ public class MainUI extends UI {
 				    "<input type=\"submit\" name=\"submit\" value=\"Upload to Amazon S3\" />" +
 				"</form>", ContentMode.HTML);
 		
-		Button buttonS3 = new Button("S3 test");
-		buttonS3.addClickListener(new Button.ClickListener() {
-			public void buttonClick(ClickEvent event) {
-				layout.addComponent(new Label("Sending Request"));
-					//System.out.println(S3SignManager.sign());
-					//UploadFileToS3();
-			}
-		});
 		Button buttonZen = new Button("Zencoder");
 		buttonZen.addClickListener(new Button.ClickListener() {
 			public void buttonClick(ClickEvent event) {
@@ -99,8 +77,8 @@ public class MainUI extends UI {
 				}
 			}
 		});
+		
 		layout.addComponent(label);
-		//layout.addComponent(buttonS3);
 		layout.addComponent(buttonZen);
 	}
 	
@@ -108,11 +86,11 @@ public class MainUI extends UI {
 		final ZencoderClient client = new ZencoderClient("bd06e2923f2fc8173f601f3c2f765063");
 		
 		ZencoderCreateJobRequest job = new ZencoderCreateJobRequest();
-		job.setInput("s3://cassiovideo/Acroba.3gp");
+		job.setInput("s3://cassiovideo/video.flv");
 		List<ZencoderOutput> outputs = new ArrayList<ZencoderOutput>();
 
 		ZencoderOutput output1 = new ZencoderOutput();
-        output1.setBaseUrl("s3://cassiovideo/");
+        output1.setBaseUrl("s3://cassiovideo/video.flv");
         output1.setFormat(ContainerFormat.MP4);
         outputs.add(output1);
 
@@ -158,14 +136,17 @@ public class MainUI extends UI {
 	
 	public String makePolicy() {
 
-		String policy =
-			      "{\"expiration\": \"2014-02-18T12:00:00.000Z\"," +
+		return   "{\"expiration\": \"2014-02-18T12:00:00.000Z\"," +
 			        "\"conditions\": [" +
 			          "{\"bucket\": \"cassiovideo\"}," +
 			          "[\"starts-with\", \"$key\", \"v\"]," +
 			          "{\"acl\": \"public-read\"}" +
 			        "]" +
 			      "}";
+		
+	}
+	
+	public String makePolicyWithJson() {
 		
 		JSONObject result = new JSONObject();
 		try {
@@ -182,8 +163,7 @@ public class MainUI extends UI {
 
 			// Passing a number to toString() adds indentation
 			System.out.println(result.toString());
-			return policy;
-			//return result.toString();
+			return result.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
