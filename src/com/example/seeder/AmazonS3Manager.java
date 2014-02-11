@@ -9,7 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class S3SignManager {
+public class AmazonS3Manager {
 	
 	private static final String UTF8 = "UTF-8";
 	private static final String HMACSHA1 = "HmacSHA1";
@@ -59,5 +59,16 @@ public class S3SignManager {
 		}
 		
 	    return null;
+	}
+
+	
+	public static String makePolicy() {
+		return   "{\"expiration\": \"2014-02-18T12:00:00.000Z\"," +
+			        "\"conditions\": [" +
+			          "{\"bucket\": \"cassiovideo\"}," +
+			          "[\"starts-with\", \"$key\", \"\"]," +
+			          "{\"acl\": \"public-read\"}" +
+			        "]" +
+			      "}";
 	}
 }
