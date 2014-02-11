@@ -16,7 +16,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -25,26 +24,21 @@ import com.vaadin.ui.VerticalLayout;
 @Theme("seeder")
 public class MainUI extends UI {
 
-	Model model = Model.getInstance();
+	public Model model = Model.getInstance();
 	
-	
+	VerticalLayout mainLayout;
 	
 	@Override
 	protected void init(VaadinRequest request) {
+		initiateMainLayout();
 		
-		buildMainLayout();
-		
-		Label restForm = buildHTMLForm();
+		Label restForm = new Label(buildHTMLForm(), ContentMode.HTML);
 		Button buttonZen = buildZencoderButton();
 		Link link = buildPlayerLink();
-		
-		VerticalLayout mainLayout = buildMainLayout();
-		
+			
 		mainLayout.addComponent(restForm);
 		mainLayout.addComponent(buttonZen);
 		mainLayout.addComponent(link);
-
-		setContent(mainLayout);
 	}
 	
 	public Link buildPlayerLink(){
@@ -55,12 +49,10 @@ public class MainUI extends UI {
 	public Button buildZencoderButton(){
 		return new Button("Zencoder",
 				new Button.ClickListener() {
-			
-			@Override
 			public void buttonClick(ClickEvent event) {
 				ZencoderManager.decodeVideo();
+				mainLayout.addComponent(new Label("Zencoder Request Sent!"));
 			}
-			
 		});	
 	}
 	
@@ -68,21 +60,21 @@ public class MainUI extends UI {
 		return  new Label("<form action=\"http://" + model.bucketName + ".s3.amazonaws.com/\" method=\"post\" enctype=\"multipart/form-data\">"+
 		    "<input type=\"hidden\" name=\"key\" value=\"video.dv\" /><br />"+
 		    "<input type=\"hidden\" name=\"acl\" value=\"public-read\" />" +
+		    //"<input type=\"hidden\" name=\"success_action_redirect\" value=\"/encode\" />" +
 		    "<input type=\"hidden\" name=\"AWSAccessKeyId\" value=\""+ model.accessKey +"\" />" +
 		    "<input type=\"hidden\" name=\"Policy\" value=\""+ model.policy +"\" />" +
 		    "<input type=\"hidden\" name=\"Signature\" value=\""+ model.signedPolicy +"\" />" +
-		    "File: <input type=\"file\" name=\"file\" />" +
+		    "File: <input type=\"file\" name=\"file\" /> <br />" +
 		    "<input type=\"submit\" name=\"submit\" value=\"Upload to Amazon S3\" />" +
 		"</form>", ContentMode.HTML);
 	}
 	
-	public VerticalLayout buildMainLayout(){
-		VerticalLayout layout = new VerticalLayout();
+	public void initiateMainLayout(){
+		mainLayout = new VerticalLayout();
+		mainLayout.setMargin(true);
+		mainLayout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+		mainLayout.setSpacing(true);
+		setContent(mainLayout);
 		
-		layout.setMargin(true);
-		layout.setSpacing(true);
-		layout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-
-		return layout;
 	}
 }

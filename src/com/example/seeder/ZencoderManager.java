@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.brightcove.zencoder.client.ZencoderClient;
-import com.brightcove.zencoder.client.ZencoderClientException;
 import com.brightcove.zencoder.client.model.ContainerFormat;
 import com.brightcove.zencoder.client.request.ZencoderCreateJobRequest;
 import com.brightcove.zencoder.client.request.ZencoderOutput;
@@ -15,9 +14,11 @@ public class ZencoderManager {
 	private static final String BASE_URL = "s3://cassiovideo/";
 	private static final String INPUT_FILE_NAME = "video.dv";
 	private static final String OUTPUT_FILE_NAME = "video.mp4";
-	
+
 	
 	public static void decodeVideo(){
+
+		ZencoderClient client = new ZencoderClient(CLIENT_ID_KEY);
 		
 		ZencoderCreateJobRequest job = new ZencoderCreateJobRequest();
 		
@@ -26,7 +27,6 @@ public class ZencoderManager {
 		
 		try {
 			
-			ZencoderClient client = new ZencoderClient(CLIENT_ID_KEY);
 			client.createZencoderJob(job);
 			
 		} catch (Exception e) {e.printStackTrace();}		
